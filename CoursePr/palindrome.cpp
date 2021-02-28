@@ -137,7 +137,7 @@ int main() {
 		cout << endl << "All words are: " << all;
 
 	}
-	catch (runtime_error e) {
+	catch (runtime_error e) {//за грешка
 		cout << "Error: " << e.what() << endl;
 	}
 	
