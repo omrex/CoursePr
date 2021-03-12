@@ -10,6 +10,8 @@
 #include <iterator>
 #include <locale>
 #include <windows.h>
+#include <ctype.h>
+
 
 
 using namespace std;
@@ -23,6 +25,11 @@ public:
 	}
 	SingleWord(string word) {
 		this->m_word = word;
+	}
+	void toLower() {
+		if (this->m_word[0] >= 'А' && this->m_word[0] <= 'Я') {
+			this->m_word[0] = this->m_word[0] + 32;
+		}
 	}
 	string getWord() {
 		return this->m_word;
@@ -96,7 +103,9 @@ public:
 				word >> infile;
 				//this->allwords.push_back(word);
 				//this->dict.insert(make_pair(word.getWord().at(0), word));
-				this->lmap[word.getWord().at(0)].push_back(word);
+				word.toLower();
+				char firstlet = word.getWord().at(0);
+				this->lmap[firstlet].push_back(word);
 			}
 			//this->allwords.sort();
 			map<char, list<SingleWord>>::iterator iter;
@@ -207,7 +216,7 @@ public:
 		}
 		return Mirrors;
 	}
-
+	
 	vector <pair<SingleWord, SingleWord>> getTwoPalz(char key) {
 		vector <pair<SingleWord, SingleWord>> Mirrors;
 			list <SingleWord>::iterator it = lmap[key].begin();
@@ -231,6 +240,21 @@ public:
 		return Mirrors;
 	}
 
+	bool legitWord(string word) {
+		int N = word.length();
+		char first = word[0];
+		SingleWord twoword(word);
+		//check if such a map exists by using count
+		if (lmap.count(first) != 0) {
+			list <SingleWord>::iterator it = find(begin(this->lmap[first]), end(this->lmap[first]), twoword);
+			if (it != this->lmap[first].end())
+			{
+				// It does not point to end, it means element exists in list
+				return true;
+			}
+		}
+		return false;
+	}
 	vector <pair<SingleWord, SingleWord>> getTwoPals(SingleWord oneword) {
 				vector <pair<SingleWord, SingleWord>> Mirrors;
 				int N = oneword.getWord().length();
@@ -267,7 +291,41 @@ public:
 		return Mirrors;
 	}
 	*/
+	
 };
+
+//shows possible words to finish right side of palindrome
+//j is the position from which to start substr
+void func(int j, string word, Dictionary dict) {
+	//i is number of chars that need to be substr
+	int i = 1;
+	//position of char + number of chars should not be more than the length of the word +1
+	while (i+j < word.length()+1) {
+		//check if the substr is not a word
+		if (!dict.legitWord(word.substr(j, i))) {
+			//if we get to the last character
+			if (i + j == word.length()) {
+				//indicate it's the end of the word and add a char so it can exit the while cycle
+				cout << endl << '\t' << '\t' <<"end: "<< word.substr(j, i);
+				i++;
+			}
+			//just add another char to the substr
+			else i++;
+		}
+		//if the substr is a word
+		else {
+			//if it starts with the first letter of the word start on a new line
+			if (j == 0) cout << endl;
+			//if it's a 2nd word put a tab and print it on a new line
+			else cout <<endl<< '\t';
+			//print the word
+			cout << word.substr(j, i);
+			//check the substr starting with the char after the previous substr
+			func(j + i, word, dict);
+			i++;
+		}
+	}
+}
 
 int main() {
 
@@ -275,7 +333,7 @@ int main() {
 	SetConsoleCP(1251);
 	
 	try {
-		Dictionary two("bgdict.txt");
+		Dictionary two("d.txt");
 		/*
 		two << cout;
 		int all = 0;
@@ -302,7 +360,17 @@ int main() {
 			i << cout;
 			cout << endl;
 		}
+		*/
+		string word = "дебил";
+		for (int i = 1; i < (word.length()+1);i++) {
+			if (two.legitWord(word.substr(0, i))) {
+				cout << endl << "Да, има " << word.substr(0, i) << " в списъка";
+			}
+		}
 
+		func(0, "дебил", two);
+
+		/*
 		cout << endl << "проверка за лебед" << endl;
 		SingleWord meh("лебед");
 		for (auto i : two.getTwoPals(meh)) {
@@ -312,13 +380,13 @@ int main() {
 		}
 		cout << endl;
 		*/
-		cout << endl << "проверка за б" << endl;
-		ofstream outFile("v_file.txt");
+		/*
+		cout << endl << "проверка за д" << endl;
 		// the important part
-		for ( auto& e : two.getTwoPalz('в')) outFile << e.first.getWord()<<" "<<e.second.getWord()<< "\n";
-		
-		cout << "DOne";
+		for ( auto& e : two.getTwoPalz('д')) cout << e.first.getWord()<<" "<<e.second.getWord()<< "\n";
+		*/
 
+		
 		/*
 		cout << endl << "проверка за всичко" << endl;
 		for (auto i : two.getTwoPal()) {
