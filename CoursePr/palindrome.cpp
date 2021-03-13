@@ -16,10 +16,12 @@
 
 using namespace std;
 
+int fin = 0;
 class SingleWord {
 private:
 	string m_word;
 public:
+	bool real = true;
 	SingleWord() {
 		this->m_word = " ";
 	}
@@ -294,19 +296,34 @@ public:
 	
 };
 
+string space(int s) {
+	string a = "";
+	while (s > 0) {
+		a += " ";
+		s--;
+	}
+	return a;
+}
+/*
 //shows possible words to finish right side of palindrome
 //j is the position from which to start substr
-void func(int j, string word, Dictionary dict) {
+vector<list<SingleWord>> func(int j, string word, Dictionary dict, list <SingleWord>blahh) {
+	vector <list<SingleWord>> choices;
 	//i is number of chars that need to be substr
 	int i = 1;
 	//position of char + number of chars should not be more than the length of the word +1
+	list <SingleWord> blahhh;
 	while (i+j < word.length()+1) {
-		//check if the substr is not a word
-		if (!dict.legitWord(word.substr(j, i))) {
+		//check if the substr is not a word	
+		string currword = word.substr(j, i);
+		SingleWord word1(currword);
+		if (!dict.legitWord(currword)) {
 			//if we get to the last character
 			if (i + j == word.length()) {
 				//indicate it's the end of the word and add a char so it can exit the while cycle
-				cout << endl << '\t' << '\t' <<"end: "<< word.substr(j, i);
+				word1.real = false;
+				blahh.push_back(word1);
+				//cout << endl << space(j+4)<<"end: "<< word.substr(j, i);
 				i++;
 			}
 			//just add another char to the substr
@@ -315,17 +332,110 @@ void func(int j, string word, Dictionary dict) {
 		//if the substr is a word
 		else {
 			//if it starts with the first letter of the word start on a new line
-			if (j == 0) cout << endl;
+			//if (j == 0) cout << endl;
 			//if it's a 2nd word put a tab and print it on a new line
-			else cout <<endl<< '\t';
+			//else cout <<endl<< space(j+4);
 			//print the word
-			cout << word.substr(j, i);
+			blahh.push_back(word1);
+			//cout << word.substr(j, i);
 			//check the substr starting with the char after the previous substr
-			func(j + i, word, dict);
+			func(j + i, word, dict, blahh);
+			i++;
+		}
+		choices.push_back(blahh);
+	}
+	return choices;
+
+}
+*/
+
+//shows possible words to finish right side of palindrome
+//j is the position from which to start substr
+string func2(int j, string word, Dictionary dict, list <string> blah, string phr) {
+	//i is number of chars that need to be substr
+	int i = 1;
+	//position of char + number of chars should not be more than the length of the word +1
+	while (i + j <= word.length()) {
+		//check if the substr is not a word	
+		if (!dict.legitWord(word.substr(j, i))) {
+			//if we get to the last character
+			if (i + j == word.length()) {
+				//indicate it's the end of the word and add a char so it can exit the while cycle
+				//blah.push_back(word1);
+				
+				
+					if (fin > j) {
+						const auto pos = phr.find_last_of(" \t\n");
+						phr = phr.substr(0, pos);
+						//cout << endl << "phr af d: " << phr;
+					}
+					if (j == 0) {
+						cout << endl << word.substr(j, i) << "*** ";
+						phr = word.substr(j, i);
+					}
+					else {
+						cout << endl << space(j + 4);// << "end: ";
+						cout << word.substr(j, i)<<"*** ";
+						phr += " ";
+						phr += word.substr(j, i);
+					}
+					cout << "\t Fin: " << phr << "***.";// << " j=" << j;
+					fin = j;
+					//cout<< " fin=" << fin;
+				
+				blah.push_back(phr);
+				i++;
+			}
+			//just add another char to the substr
+			else {
+				i++;
+			}
+		}
+		//if the substr is a word
+		else {
+			//if it starts with the first letter of the word start on a new line
+			if (j == 0) {cout << endl;
+				phr = word.substr(j, i);
+				//fin = false;
+			}
+			//if it's a 2nd word put a tab and print it on a new line
+			else {
+				//cout << endl << fin << " " << j << " phr upto: " << phr;
+				
+				if (fin > j) {
+					const auto pos = phr.find_last_of(" \t\n");
+					phr = phr.substr(0, pos);
+					//cout << endl << "phr af d: " << phr;
+				}		
+				
+				cout << endl << space(j + 4);
+				phr += " ";
+				phr += word.substr(j, i);
+				if (i + j == word.length()) {
+					//cout << "endd: ";
+				}
+			}
+			//print the word
+			//blah.push_back(word1);
+			cout << word.substr(j, i);
+			if (i + j != word.length()) {}//cout << " So far: " << phr << " j=" << j; }
+			else{
+				blah.push_back(phr);
+				cout << " \t Fin: " << phr << ".";// << " j=" << j;
+				fin = j;
+				//cout << " fin: " << fin;
+			}
+			//check the substr starting with the char after the previous substr
+			func2(j + i, word, dict, blah, phr);			
 			i++;
 		}
 	}
+	return phr;
+
+
+
 }
+
 
 int main() {
 
@@ -361,14 +471,27 @@ int main() {
 			cout << endl;
 		}
 		*/
+		/*
 		string word = "дебил";
 		for (int i = 1; i < (word.length()+1);i++) {
 			if (two.legitWord(word.substr(0, i))) {
 				cout << endl << "Да, има " << word.substr(0, i) << " в списъка";
 			}
 		}
+		*/
+		string myword;
+		cout << "Въведи дума ";
+		cin >> myword;
+		
+		list <string> meh;
+		//vector <list<SingleWord>> res= func(0, myword, two, blah);
+		string helping = "";
+		int flag = 0;
+		func2(0, myword, two, meh, helping);
 
-		func(0, "дебил", two);
+		for (auto i : meh) {
+			cout << i<< endl;
+		}
 
 		/*
 		cout << endl << "проверка за лебед" << endl;
