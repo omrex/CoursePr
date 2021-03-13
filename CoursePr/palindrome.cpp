@@ -17,11 +17,12 @@
 using namespace std;
 
 int fin = 0;
+list <string> blah;
+
 class SingleWord {
 private:
 	string m_word;
 public:
-	bool real = true;
 	SingleWord() {
 		this->m_word = " ";
 	}
@@ -219,28 +220,6 @@ public:
 		return Mirrors;
 	}
 	
-	vector <pair<SingleWord, SingleWord>> getTwoPalz(char key) {
-		vector <pair<SingleWord, SingleWord>> Mirrors;
-			list <SingleWord>::iterator it = lmap[key].begin();
-			for (it; it != lmap[key].end(); it++) {
-				SingleWord oneword = *it;
-				if (!oneword.isPal()) {
-					int N = oneword.getWord().length();
-					char last = oneword.getWord().at(N - 1);
-					SingleWord twoword(oneword.getRev());
-					if (lmap.count(last) != 0) {
-						list <SingleWord>::iterator itr = find(begin(this->lmap[last]), end(this->lmap[last]), twoword);
-						if (itr != this->lmap[last].end())
-						{
-							// It does not point to end, it means element exists in list
-							Mirrors.push_back({ oneword,twoword });
-						}
-					}
-				}
-			}
-		
-		return Mirrors;
-	}
 
 	bool legitWord(string word) {
 		int N = word.length();
@@ -273,7 +252,28 @@ public:
 				}
 		return Mirrors;
 	}
+	vector <pair<SingleWord, SingleWord>> getTwoPals(char key) {
+		vector <pair<SingleWord, SingleWord>> Mirrors;
+		list <SingleWord>::iterator it = lmap[key].begin();
+		for (it; it != lmap[key].end(); it++) {
+			SingleWord oneword = *it;
+			if (!oneword.isPal()) {
+				int N = oneword.getWord().length();
+				char last = oneword.getWord().at(N - 1);
+				SingleWord twoword(oneword.getRev());
+				if (lmap.count(last) != 0) {
+					list <SingleWord>::iterator itr = find(begin(this->lmap[last]), end(this->lmap[last]), twoword);
+					if (itr != this->lmap[last].end())
+					{
+						// It does not point to end, it means element exists in list
+						Mirrors.push_back({ oneword,twoword });
+					}
+				}
+			}
+		}
 
+		return Mirrors;
+	}
 	/*
 	//vector of all 2-word palindromes
 	vector <pair<SingleWord, SingleWord>> getTwoWord() {
@@ -351,7 +351,7 @@ vector<list<SingleWord>> func(int j, string word, Dictionary dict, list <SingleW
 
 //shows possible words to finish right side of palindrome
 //j is the position from which to start substr
-string func2(int j, string word, Dictionary dict, list <string> blah, string phr) {
+string func2(int j, string word, Dictionary dict,  string phr) {
 	//i is number of chars that need to be substr
 	int i = 1;
 	//position of char + number of chars should not be more than the length of the word +1
@@ -361,14 +361,13 @@ string func2(int j, string word, Dictionary dict, list <string> blah, string phr
 			//if we get to the last character
 			if (i + j == word.length()) {
 				//indicate it's the end of the word and add a char so it can exit the while cycle
-				//blah.push_back(word1);
-				
-				
+				    //if the recursion is bigger than the current j, delete the last word in the string			
 					if (fin > j) {
 						const auto pos = phr.find_last_of(" \t\n");
 						phr = phr.substr(0, pos);
 						//cout << endl << "phr af d: " << phr;
 					}
+					//if the whole word does not exist
 					if (j == 0) {
 						cout << endl << word.substr(j, i) << "*** ";
 						phr = word.substr(j, i);
@@ -380,6 +379,7 @@ string func2(int j, string word, Dictionary dict, list <string> blah, string phr
 						phr += word.substr(j, i);
 					}
 					cout << "\t Fin: " << phr << "***.";// << " j=" << j;
+					//fin will take the value of j
 					fin = j;
 					//cout<< " fin=" << fin;
 				
@@ -393,15 +393,14 @@ string func2(int j, string word, Dictionary dict, list <string> blah, string phr
 		}
 		//if the substr is a word
 		else {
-			//if it starts with the first letter of the word start on a new line
+			//if it starts with the first letter of the word start on a new line 
 			if (j == 0) {cout << endl;
 				phr = word.substr(j, i);
-				//fin = false;
 			}
-			//if it's a 2nd word put a tab and print it on a new line
+			//if it's a inbetween word put a tab and print it on a new line
 			else {
 				//cout << endl << fin << " " << j << " phr upto: " << phr;
-				
+				//if the previous final phrase required a bigger than the current recursion, delete last word of the string
 				if (fin > j) {
 					const auto pos = phr.find_last_of(" \t\n");
 					phr = phr.substr(0, pos);
@@ -411,12 +410,13 @@ string func2(int j, string word, Dictionary dict, list <string> blah, string phr
 				cout << endl << space(j + 4);
 				phr += " ";
 				phr += word.substr(j, i);
+				/*
 				if (i + j == word.length()) {
-					//cout << "endd: ";
+					cout << "endd: ";
 				}
+				*/
 			}
 			//print the word
-			//blah.push_back(word1);
 			cout << word.substr(j, i);
 			if (i + j != word.length()) {}//cout << " So far: " << phr << " j=" << j; }
 			else{
@@ -426,7 +426,7 @@ string func2(int j, string word, Dictionary dict, list <string> blah, string phr
 				//cout << " fin: " << fin;
 			}
 			//check the substr starting with the char after the previous substr
-			func2(j + i, word, dict, blah, phr);			
+			func2(j + i, word, dict, phr);			
 			i++;
 		}
 	}
@@ -436,11 +436,93 @@ string func2(int j, string word, Dictionary dict, list <string> blah, string phr
 
 }
 
+void menu()
+{
+	cout << "Натиснете 1 за да разгледате всички думи палиндроми" << endl;
+	cout << "Натиснете 2 за да проверите дали огледална дума съществува" << endl;
+	cout << "Натиснете 3 за да разгледате всички огледални думи, започващи с конкретна буква" << endl;
+	cout << "Натиснете 4 за да създадете палиндром" << endl;
+	cout << "Натиснете 0 за да затворите програмата" << endl;
+}
+
+
+void select(char choice, Dictionary mydict)
+{
+	// Display the result 
+	switch (choice) {
+	case '1': {
+		cout << "Палиндромите са: " << "\n";
+		int all = 0;
+		for (auto i : mydict.getPal()) {
+			i << cout;
+			all++;
+			cout << endl;
+		}
+		cout << endl << "Общ брой: " << all << endl;
+		break;
+	}
+	case '2': {
+		string myword;
+		cout << "Въведи дума: ";
+		cin >> myword;
+		SingleWord clword(myword);
+		if (!mydict.legitWord(myword)) cout << endl << "Въведената дума е невалидна" << endl;
+		else {
+			vector <pair<SingleWord, SingleWord>> result = mydict.getTwoPals(myword);
+			if (!result.empty()) {
+				for (auto i : result) {
+					i.first << cout << " ";
+					i.second << cout;
+					cout << endl;
+				}
+			}
+			else cout << endl <<clword.getRev() <<" не е дума"<<endl;
+		}
+		break;
+	}
+	case '3': {
+		char myword;
+		cout << "Въведи буква: ";
+		cin >> myword;
+		for (auto i : mydict.getTwoPals(myword)) {
+			i.first << cout << " ";
+			i.second << cout;
+			cout << endl;
+		}
+		break;
+	}
+	case '4': {
+
+		string myword;
+		cout << "Въведи дума: ";
+		cin >> myword;
+		SingleWord clword(myword);
+		string helping = "";
+		int flag = 0;
+		func2(0, clword.getRev(), mydict, helping);
+
+		cout << endl << "Вариантите са:" << endl;
+		for (auto i : blah) {
+			cout << i << endl;
+		}
+		blah.clear();
+		break;
+	}
+	case '0': {
+		cout << "До нови срещи!" << endl;
+		break;
+	}
+	default:
+		cout<<"Невалиден избор"<<endl;
+	}
+}
 
 int main() {
 
 	SetConsoleOutputCP(1251);
 	SetConsoleCP(1251);
+
+	cout << "Моля изчакайте, програмата да зареди." << endl;
 	
 	try {
 		Dictionary two("d.txt");
@@ -462,54 +544,19 @@ int main() {
 		*/
 
 		
-		
 		//two.MMap();
 		//two.LMap();
-		/*
-		for (auto i : two.getPal()) {
-			i << cout;
-			cout << endl;
-		}
-		*/
-		/*
-		string word = "дебил";
-		for (int i = 1; i < (word.length()+1);i++) {
-			if (two.legitWord(word.substr(0, i))) {
-				cout << endl << "Да, има " << word.substr(0, i) << " в списъка";
-			}
-		}
-		*/
-		string myword;
-		cout << "Въведи дума ";
-		cin >> myword;
 		
-		list <string> meh;
-		//vector <list<SingleWord>> res= func(0, myword, two, blah);
-		string helping = "";
-		int flag = 0;
-		func2(0, myword, two, meh, helping);
+		menu();
+		// Enter the choice 
+		char ch;
+		do {
+			cout << endl << "Въведи избор:" << endl;
+			cin >> ch;
+			select(ch, two);
+		} while (ch != '0');
+			
 
-		for (auto i : meh) {
-			cout << i<< endl;
-		}
-
-		/*
-		cout << endl << "проверка за лебед" << endl;
-		SingleWord meh("лебед");
-		for (auto i : two.getTwoPals(meh)) {
-			i.first << cout << " ";
-			i.second << cout;
-			cout << endl;
-		}
-		cout << endl;
-		*/
-		/*
-		cout << endl << "проверка за д" << endl;
-		// the important part
-		for ( auto& e : two.getTwoPalz('д')) cout << e.first.getWord()<<" "<<e.second.getWord()<< "\n";
-		*/
-
-		
 		/*
 		cout << endl << "проверка за всичко" << endl;
 		for (auto i : two.getTwoPal()) {
