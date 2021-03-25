@@ -589,8 +589,6 @@ public:
 
 
 	bool createpal(string myword) {
-			vector<string>::iterator itr = mypal.begin();
-			mypal.insert(itr, myword);
 			SingleWord clword(myword);
 			string helping = "";
 			int flag = 0;
@@ -628,7 +626,7 @@ public:
 					cout << "Натиснете 0 за да се върнете към предното меню" << endl;
 					char cha;
 					do {
-						cout << endl << "Въведи своя избор: ";
+						cout << endl << "Въведи своя избор за дописване: ";
 						cin >> cha;
 						switch (cha) {
 						case '1': {
@@ -637,7 +635,7 @@ public:
 								do {
 									cout << "Добави две или повече букви: "<< unfinished;
 									cin >> mychars;
-								} while (mychars.length() < 2);
+								} while (unfinished.length()+mychars.length() < 3);
 							}
 							mychars=unfinished+mychars;
 							finishWord(mychars);
@@ -652,10 +650,10 @@ public:
 							if (!legitWord(unfinished+myword)) cout << endl << "Въведената дума е невалидна!" << endl;
 							else {
 								// maybe a solution for adding the end part to the word
-								mypal.back() = mypal.back().substr(0, pos+1)+unfinished;
-								cout << mypal.back();
+								mypal.back() = mypal.back().substr(0, pos+1)+unfinished+myword;
 								rightwordcreatepal(myword);
 							}
+							cha = '0';//to exit the do while cycle
 							break;
 						}
 						case '0': {
@@ -684,7 +682,7 @@ public:
 		////mypal.insert(itr, myword);
 		//if (!legitWord(myword)) cout << endl << "Въведената дума е невалидна!" << endl;
 		//else {
-		mypal.push_back(myword);
+		//mypal.push_back(myword);
 		SingleWord clword(myword);
 		string helping = "";
 		int flag = 0;
@@ -804,6 +802,8 @@ void select(char choice, Dictionary mydict)
 		cin >> myword;
 		if (!mydict.legitWord(myword)) cout << endl << "Въведената дума е невалидна!" << endl;
 		else {
+			vector<string>::iterator itr = mydict.mypal.begin();
+			mydict.mypal.insert(itr, myword);
 			if (mydict.createpal(myword)) {
 				submenu4();
 				char cha;
@@ -816,6 +816,8 @@ void select(char choice, Dictionary mydict)
 						cin >> myword;
 						if (!mydict.legitWord(myword)) cout << endl << "Въведената дума е невалидна!" << endl;
 						else {
+							vector<string>::iterator itr = mydict.mypal.begin();
+							mydict.mypal.insert(itr, myword);
 							mydict.createpal(myword);
 						}
 						break;
@@ -827,6 +829,7 @@ void select(char choice, Dictionary mydict)
 						//mypal.insert(itr, myword);
 						if (!mydict.legitWord(myword)) cout << endl << "Въведената дума е невалидна!" << endl;
 						else {
+							mydict.mypal.push_back(myword);
 							mydict.rightwordcreatepal(myword);
 						}
 						break;
@@ -866,6 +869,7 @@ void select(char choice, Dictionary mydict)
 		//mypal.insert(itr, myword);
 		if (!mydict.legitWord(myword)) cout << endl << "Въведената дума е невалидна!" << endl;
 		else {
+			mydict.mypal.push_back(myword);
 			mydict.rightwordcreatepal(myword);
 		}
 		break;
