@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <string_view>
 //#include <string.h>
 #include <map>
 #include <set>
@@ -633,7 +634,7 @@ public:
 							string mychars;
 							if (unfinished.length() < 3) {
 								do {
-									cout << "Добави две или повече букви: "<< unfinished;
+									cout << "Добави " << 3 - unfinished.length() << " или повече букви: "<< unfinished;
 									cin >> mychars;
 								} while (unfinished.length()+mychars.length() < 3);
 							}
@@ -652,8 +653,8 @@ public:
 								// maybe a solution for adding the end part to the word
 								mypal.back() = mypal.back().substr(0, pos+1)+unfinished+myword;
 								rightwordcreatepal(myword);
-							}
-							cha = '0';//to exit the do while cycle
+								cha = '0';//to exit the do while cycle
+							}						
 							break;
 						}
 						case '0': {
@@ -715,6 +716,60 @@ public:
 			}
 			cout << endl;
 			blah.clear();
+			if (mypal.front().at(0) == '*') {
+				const auto pos = mypal.front().find(" \t\n");
+				string unfinished = mypal.front().substr(1,pos);
+				cout << endl << endl << "Как ще допишете *" << unfinished << "?" << endl;
+				cout << "Натиснете 1 за да разгледате думи завършващи на " << unfinished << endl;
+				cout << "Натиснете 2 за да допишете думата" << endl;
+				cout << "Натиснете 0 за да се върнете към предното меню" << endl;
+				char cha;
+				do {
+					cout << endl << "Въведи своя избор за дописване: ";
+					cin >> cha;
+					switch (cha) {
+					case '1': {
+						string mychars;
+						if (unfinished.length() < 3) {
+							do {
+								cout << "Добави "<< 3-unfinished.length() <<" или повече букви: \t" <<unfinished;
+								cin >> mychars;
+							} while (unfinished.length() + mychars.length() < 3);
+						}
+						mychars = mychars + unfinished;
+						startWord(mychars);
+						break;
+					}
+					case '2': {
+						string myword;
+						cout << "Въведи дума, завършваща на " << unfinished<<": ";
+						cin >> myword;
+						//vector<string>::iterator itr = mypal.begin(); --old not sure what I needed it for
+						//mypal.insert(itr, myword);
+						if (!myword.ends_with(unfinished)) cout << "Въведената дума не завършва на " << unfinished << "!";
+						else {
+							if (!legitWord(myword)) cout << endl << "Въведената дума е невалидна!" << endl;
+							else {
+								auto end = myword.find(unfinished);					
+								myword=myword.substr(0, end);
+								// maybe a solution for adding the first part to the word
+								mypal.front().erase(0, 1);
+								mypal.front()= mypal.front().insert(0, myword);
+								createpal(myword);
+								cha = '0';//to exit the do while cycle
+							}
+						}
+						break;
+					}
+					case '0': {
+						break;
+					}
+					default:
+						cout << "Невалиден избор" << endl;
+
+					}
+				} while (cha != '0');
+			}
 			return true;
 		}
 		else cout << endl << "Не може да се създаде палиндром с тази дума";
@@ -903,7 +958,7 @@ int main() {
 	SetConsoleCP(1251);
 
 	try {
-		Dictionary two("d.txt");
+		Dictionary two("bgdict.txt");
 		/*
 		two << cout;
 		int all = 0;
