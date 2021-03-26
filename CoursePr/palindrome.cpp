@@ -437,23 +437,23 @@ public:
 					}
 					//if the whole word does not exist
 					if (j == 0) {
-						cout << endl << word.substr(j, i) << "***";
+						//cout << endl << word.substr(j, i) << "***";
 						phr = word.substr(j, i) + "*";
 					}
 					else {
-						cout << endl << space(j + 4);// << "end: ";
-						cout << word.substr(j, i) << "***";
+						//cout << endl << space(j + 4);// << "end: ";
+						//cout << word.substr(j, i) << "***";
 						phr += " ";
 						phr += word.substr(j, i) + "*";
 					}
-					cout << "\t " << phr << "***. ";// << word.substr(j, i);// << " j=" << j; final
+					//cout << "\t " << phr << "***. ";// << word.substr(j, i);// << " j=" << j; final
 					//fin will take the value of j
 					fin = j;
 					//cout<< " fin=" << fin;
 					if (canYouAdd(word.substr(j, i))) {
 						blah.push_back(phr);
 					}
-					else cout << "\tНяма дума започваща така => невъзможна опция" << endl;
+					//else cout << "\tНяма дума започваща така => невъзможна опция" << endl;
 					i++;
 				}
 				//just add another char to the substr
@@ -465,7 +465,7 @@ public:
 			else {
 				//if it starts with the first letter of the word start on a new line 
 				if (j == 0) {
-					cout << endl;
+					//cout << endl;
 					phr = word.substr(j, i);
 				}
 				//if it's a inbetween word put a tab and print it on a new line
@@ -478,7 +478,7 @@ public:
 						//cout << endl << "phr af d: " << phr;
 					}
 
-					cout << endl << space(j + 4);
+					//cout << endl << space(j + 4);
 					phr += " ";
 					phr += word.substr(j, i);
 					/*
@@ -488,11 +488,11 @@ public:
 					*/
 				}
 				//print the word
-				cout << word.substr(j, i);
+				//cout << word.substr(j, i);
 				if (i + j != word.length()) {}//cout << " So far: " << phr << " j=" << j; }
 				else {
 					blah.push_back(phr);
-					cout << " \t Fin: " << phr << ".";// << " j=" << j;
+					//cout << " \t Fin: " << phr << ".";// << " j=" << j;
 					fin = j;
 					//cout << " fin: " << fin;
 				}
@@ -524,16 +524,16 @@ public:
 						//cout << endl << "phr af d:" << phr << ".";
 						fin2 = 0;
 					}
-					cout <<endl << space(j+4)<< "**" << word.substr(j, i);
+					//cout <<endl << space(j+4)<< "**" << word.substr(j, i);
 					//if (i == word.length()) { phr = "*" + word.substr(j, i); }
 					//else {
 						phr.insert(0, "*" + word.substr(j, i));
 					//}
-						cout << "\t\t\t:" << phr;// << "." << " Край" << " fin2 = " << fin2 << " j = " << j << " i = " << i;
+						//cout << "\t\t\t:" << phr;// << "." << " Край" << " fin2 = " << fin2 << " j = " << j << " i = " << i;
 						if (canYouFinish(word.substr(j, i))) {
 							blah.push_back(phr);
 						}
-						else cout << "\tНяма дума започваща така => невъзможна опция" << endl;
+						//else cout << "\tНяма дума започваща така => невъзможна опция" << endl;
 					fin2 = 1;
 					j--;
 				}
@@ -560,12 +560,12 @@ public:
 				
 
 				//print the substr
-				cout << endl << space(j + 8) << word.substr(j, i);// << " е дума fin2=" << fin2 << " j=" << j << " i=" << i;
+				//cout << endl << space(j + 8) << word.substr(j, i);// << " е дума fin2=" << fin2 << " j=" << j << " i=" << i;
 				//is j at the beginning of the word
 				if (j == 0) {
 					phr.insert(0, word.substr(j, i));
 					fin2 = 1;
-					cout << "\t\t\t:" << phr  ;// ". край";
+					//cout << "\t\t\t:" << phr  ;// ". край";
 					blah.push_back(phr);
 					
 				}
@@ -592,8 +592,14 @@ public:
 	bool createpal(string myword) {
 			SingleWord clword(myword);
 			string helping = "";
+			if (mypal.size()==1) {
+				SingleWord clword2(myword.substr(0, myword.length() - 1));//
+				func2(0, clword2.getRev(), helping);
+				//txt functions to add
+			}
 			int flag = 0;
 			func2(0, clword.getRev(), helping);
+			
 			if (!blah.empty()) {
 				cout << endl << "Вариантите са:" << endl;
 				int count = 0;
@@ -669,7 +675,10 @@ public:
 				cout << endl;
 				return true;
 			}
-			else cout << endl << "Не може да се създаде палиндром с тази дума";
+			else {
+				cout << endl << "Не може да се създаде палиндром с тази дума ляво";
+				mypal.erase(mypal.begin(), mypal.begin()+1);
+			}
 		return false;
 	}
 
@@ -772,7 +781,10 @@ public:
 			}
 			return true;
 		}
-		else cout << endl << "Не може да се създаде палиндром с тази дума";
+		else {
+			cout << endl << "Не може да се създаде палиндром с тази дума дясно";
+			mypal.pop_back(); //delete the word from the user
+		}
 	//}
 	return false;
 	}
@@ -958,7 +970,7 @@ int main() {
 	SetConsoleCP(1251);
 
 	try {
-		Dictionary two("bgdict.txt");
+		Dictionary two("d.txt");
 		/*
 		two << cout;
 		int all = 0;
