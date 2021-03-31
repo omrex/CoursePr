@@ -353,9 +353,36 @@ public:
 					cout<<word.getRev() << endl;
 				}
 			}
-			else cout << endl << "Няма думи завършващи с: " << begword;
+			else cout << endl << "Няма думи завършващи с: " << beg.getWord();
 		}
 		else cout << endl << "Няма думи завършващи с: " << first;
+	}
+
+	void startWordextra(string begword) {
+		SingleWord beg(begword);
+		begword = beg.getRev();
+		char first = begword.at(0);
+		int L = begword.length();
+		if (revmap.count(first) != 0) {
+			list <SingleWord>::iterator it = find_if(begin(this->revmap[first]), end(this->revmap[first]),
+				[&](SingleWord v) { return v.getWord().substr(0, L) == begword; });
+			list <SingleWord>::iterator itr = find_if_not(it, end(this->revmap[first]),
+				[&](SingleWord v) { return v.getWord().substr(0, L) == begword; });
+			if (it != this->revmap[first].end()) {
+				// It does not point to end, it means at least one element exists in the list
+
+				for (it; it != itr; it++) {
+					SingleWord word = *it;
+					SingleWord partOfWord(word.getWord().substr(L)); //get the rest of the word (word minus the input)
+					if (partOfWord.getWord().size() > 0 && partOfWord.isPal()) {
+						cout << word.getRev() << endl;
+						//return word.getRev();
+					}
+				}
+			}
+			else cout << endl << "Няма думи завършващи с: " << beg.getWord() <<" чието начало е палиндром";
+		}
+		else cout << endl << "Няма думи завършващи с: " << first << " чието начало е палиндром";
 	}
 
 	bool canYouAdd(string begword) {
@@ -592,11 +619,19 @@ public:
 	bool createpal(string myword) {
 			SingleWord clword(myword);
 			string helping = "";
-			if (mypal.size()==1) {
-				SingleWord clword2(myword.substr(0, myword.length() - 1));//
-				func2(0, clword2.getRev(), helping);
+			
+			if (mypal.size()==1) { //check if that's the first word of the palindromic phrase
+				for (int count = 0; count < myword.length(); count++) {//checks if input word ends with palindrome of any length
+					SingleWord lastpart(clword.getWord().substr(count));
+					if (lastpart.isPal()) {
+						SingleWord clword2 (clword.getWord().substr(0,count));
+						func2(0, clword2.getRev(), helping);
+					}				
+				}
 				//txt functions to add
+				//blah.push_back(startWordextra(myword));
 			}
+			
 			int flag = 0;
 			func2(0, clword.getRev(), helping);
 			
@@ -741,12 +776,16 @@ public:
 						string mychars;
 						if (unfinished.length() < 3) {
 							do {
-								cout << "Добави "<< 3-unfinished.length() <<" или повече букви: \t" <<unfinished;
+								cout << "Добави "<< 3-unfinished.length() <<" или повече букви преди " <<unfinished<<":"<<endl;
 								cin >> mychars;
+								if (!mychars.ends_with(unfinished)) cout << "Въведените букви не завършват с " << unfinished << "!";
+								else {
+									//mychars = mychars + unfinished;
+									startWord(mychars);
+								}
 							} while (unfinished.length() + mychars.length() < 3);
 						}
-						mychars = mychars + unfinished;
-						startWord(mychars);
+						
 						break;
 					}
 					case '2': {
@@ -813,6 +852,7 @@ void menu()
 	cout << "Натиснете 5 за да намерите думи, започващи с конкретни букви" << endl;
 	cout << "Натиснете 6 за да създадете палиндром наляво" << endl;
 	cout << "Натиснете 7 за да намерите думи, завършващи с конкретни букви" << endl;
+	cout << "Натиснете 8 за да намерите думи, завършващи с конкретни букви, чието начало е палиндром" << endl;
 	cout << "Натиснете 0 за да затворите програмата" << endl;
 }
 
@@ -950,6 +990,18 @@ void select(char choice, Dictionary mydict)
 			break;
 		}
 		mydict.startWord(mychars);
+
+		break;
+	}
+	case '8': {
+		string mychars;
+		cout << "Въведи две или повече крайни букви на думата: ";
+		cin >> mychars;
+		if (mychars.length() < 2) {
+			cout << "Въведи крайни букви на думата: ";
+			break;
+		}
+		mydict.startWordextra(mychars);
 
 		break;
 	}
