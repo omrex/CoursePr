@@ -1023,7 +1023,7 @@ void select(char choice, Dictionary mydict)
 			mydict.startWordextra(clword.getRev().substr(0, count));
 			cout << " =>остатък за търсене: " << clword.getRev().substr(count) << endl;
 			if (clword.getRev().substr(count).length() > 0) {
-				mydict.func2(0,clword.getRev().substr(count), options);
+				mydict.func2(0,clword.getRev().substr(count), options);//добави wop към функцията
 				if (!mydict.wordOptions.empty()) {
 					cout << endl << "Вариантите са:" << endl;
 					int count = 0;
@@ -1056,7 +1056,7 @@ int main() {
 	SetConsoleCP(1251);
 
 	try {
-		Dictionary two("bgdict.txt");
+		Dictionary two("d.txt");
 		/*
 		two << cout;
 		int all = 0;
