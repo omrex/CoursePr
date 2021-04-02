@@ -154,7 +154,7 @@ public:
 	}
 
 	int fin = 0;
-	list <string> wordOptions;
+	//list <string> wordOptions;
 	vector<string> mypal;
 	int fin2 = 0;
 
@@ -358,7 +358,8 @@ public:
 		else cout << endl << "Няма думи завършващи с: " << first;
 	}
 
-	void startWordextra(string begword) {
+	list <string> startWordextra(string begword) {
+		list <string> result;
 		SingleWord beg(begword);
 		begword = beg.getRev();
 		char first = begword.at(0);
@@ -375,14 +376,16 @@ public:
 					SingleWord word = *it;
 					SingleWord partOfWord(word.getWord().substr(L)); //get the rest of the word (word minus the input)
 					if (partOfWord.getWord().size() > 0 && partOfWord.isPal()) {
-						cout << endl << word.getRev();
+						//cout << endl << word.getRev();
 						//return word.getRev();
+						result.push_back(word.getRev());
 					}
 				}
 			}
 			else cout << endl << "Няма думи завършващи с: " << beg.getWord() <<" чието начало е палиндром";
 		}
 		else cout << endl << "Няма думи завършващи с: " << first << " чието начало е палиндром";
+		return result;
 	}
 
 	bool canYouAdd(string begword) {
@@ -446,7 +449,7 @@ public:
 		return a;
 	}
 
-	string func2(int j, string word, string phr) {
+	string func2(int j, string word, string phr, list <string> &wordOptions) {
 		//i is number of chars that need to be substr
 		int i = 1;
 		//position of char + number of chars should not be more than the length of the word +1
@@ -524,7 +527,7 @@ public:
 					//cout << " fin: " << fin;
 				}
 				//check the substr starting with the char after the previous substr
-				func2(j + i, word, phr);
+				func2(j + i, word, phr, wordOptions);
 				i++;
 			}
 		}
@@ -532,7 +535,7 @@ public:
 	}
 
 
-	string minusfunc2(int j, string word, string phr) {
+	string minusfunc2(int j, string word, string phr, list <string> wordOptions) {
 		//i is number of chars that need to be substr
 		//cout << endl<<"j= "<< j ;
 		int i = 1;
@@ -605,7 +608,7 @@ public:
 				//fin2 = i + j;
 				//fin2 = j;
 				//check the substr starting with the char before the previous substr
-				minusfunc2(j - 1, word, phr);	
+				minusfunc2(j - 1, word, phr, wordOptions);
 				j--;
 				i++;
 
@@ -618,13 +621,14 @@ public:
 
 	bool createpal(string myword) {
 			SingleWord clword(myword);
-			string helping = "";			
+			string helping = "";
+			list <string> wordOptions;
 			if (mypal.size()==1) { //check if that's the first word of the palindromic phrase
 				for (int count = 0; count < myword.length(); count++) {//checks if input word ends with palindrome of any length
 					SingleWord lastpart(clword.getWord().substr(count));
 					if (lastpart.isPal()) {
 						SingleWord clword2 (clword.getWord().substr(0,count));
-						func2(0, clword2.getRev(), helping);
+						func2(0, clword2.getRev(), helping, wordOptions);
 					}				
 				}
 				//txt functions to add
@@ -638,7 +642,7 @@ public:
 			}
 			
 			int flag = 0;
-			func2(0, clword.getRev(), helping);
+			func2(0, clword.getRev(), helping, wordOptions);
 			
 			if (!wordOptions.empty()) {
 				cout << endl << "Вариантите са:" << endl;
@@ -735,9 +739,10 @@ public:
 		//mypal.push_back(myword);
 		SingleWord clword(myword);
 		string helping = "";
+		list <string> wordOptions;
 		int flag = 0;
 		int start = myword.length() - 1;
-		minusfunc2(start, clword.getRev(), helping);
+		minusfunc2(start, clword.getRev(), helping, wordOptions);
 		
 		if (!wordOptions.empty()) {
 			cout << endl << "Вариантите са:" << endl;
@@ -961,7 +966,7 @@ void select(char choice, Dictionary mydict)
 				} while (cha != '0');
 			}
 		}
-		mydict.wordOptions.clear();
+		//mydict.wordOptions.clear();
 		break;
 	}
 	case '5': {
@@ -1011,31 +1016,52 @@ void select(char choice, Dictionary mydict)
 
 		break;
 	}
-			
+			//009
 	case '9': {
 		string myword;
 		cout << "Въведи думата: ";
 		cin >> myword;
 		SingleWord clword(myword);
-		string options;
+		string helping;
+		list <string> wordOptions;
+		list <string> result;
+		list <string> combination;
 		for (int count = myword.length(); count > 0; count--) {
-			cout << endl << "new for loop";
-			mydict.startWordextra(clword.getRev().substr(0, count));
-			cout << " =>остатък за търсене: " << clword.getRev().substr(count) << endl;
-			if (clword.getRev().substr(count).length() > 0) {
-				mydict.func2(0,clword.getRev().substr(count), options);//добави wop към функцията
-				if (!mydict.wordOptions.empty()) {
-					cout << endl << "Вариантите са:" << endl;
-					int count = 0;
-					for (auto i : mydict.wordOptions) {
-						cout << count + 1 << ". " << i << endl;
-						count++;
-					}
-					mydict.wordOptions.clear();
+			cout << endl << "new for loop ";
+			result=mydict.startWordextra(clword.getRev().substr(0, count));
+			for (auto i : result) {
+					cout << i << endl;
 				}
+			if (result.size() > 0) {
+				cout << " =>остатък за търсене: " << clword.getRev().substr(count) << endl;
+				if (clword.getRev().substr(count).length() > 0) {
+					mydict.func2(0, clword.getRev().substr(count), helping, wordOptions);
+					if (!wordOptions.empty()) {
+						for (auto i : result) {
+							for (auto j : wordOptions) {
+								cout << i+" "+j << endl;
+								combination.push_back(i + " " + j);
+							}
+						}
+						//wordOptions.clear();
+					}
+				}
+				/*else {
+					for (auto i : result) {
+						cout  << i << endl;
+						combination.push_back(i);
+					}
+					
+				}*/
 			}
+			
 		}
-
+		cout << endl << "Вариантите са:" << endl;
+		int c = 0;
+		for (auto i : combination) {
+			cout << i << endl;
+			c++;
+		}
 		break;
 	}
 	
