@@ -371,20 +371,16 @@ public:
 				[&](SingleWord v) { return v.getWord().substr(0, L) == begword; });
 			if (it != this->revmap[first].end()) {
 				// It does not point to end, it means at least one element exists in the list
-				cout << endl << "Има думи завършващи с: " << beg.getWord() << " чието начало е палиндром";
 				for (it; it != itr; it++) {
 					SingleWord word = *it;
 					SingleWord partOfWord(word.getWord().substr(L)); //get the rest of the word (word minus the input)
 					if (partOfWord.getWord().size() > 0 && partOfWord.isPal()) {
-						//cout << endl << word.getRev();
-						//return word.getRev();
+						//cout << word.getRev()<<endl;
 						result.push_back(word.getRev());
 					}
 				}
 			}
-			else cout << endl << "Няма думи завършващи с: " << beg.getWord() <<" чието начало е палиндром";
 		}
-		else cout << endl << "Няма думи завършващи с: " << first << " чието начало е палиндром";
 		return result;
 	}
 
@@ -631,14 +627,37 @@ public:
 						func2(0, clword2.getRev(), helping, wordOptions);
 					}				
 				}
-				//txt functions to add
-				/*
+				//adding a word that starts with palindrome but ends with all of part of the input word
+				string helping;
+				list <string> wordO;
+				list <string> result;
 				for (int count = myword.length(); count > 0; count--) {
-					cout << endl << "new for loop";
-					startWordextra(clword.getRev().substr(0, count));	
-					cout << " =>left: "<< clword.getRev().substr(count) <<endl;
+					//cout << endl << "new for loop "<<endl;
+					result = startWordextra(clword.getRev().substr(0, count));
+					if (result.size() > 0) {
+						//cout << " =>остатък за търсене: " << clword.getRev().substr(count) << endl;
+						if (clword.getRev().substr(count).length() > 0) {
+							func2(0, clword.getRev().substr(count), helping, wordO);
+							if (!wordO.empty()) {
+								for (auto i : result) {
+									for (auto j : wordO) {
+										//cout << "combination " <<i+" "+j << endl;
+										wordOptions.push_back(i + " " + j);
+									}
+								}
+								wordO.clear();
+							}
+						}
+						else {
+							for (auto i : result) {
+								//cout  <<"full comb " <<i << endl;
+								wordOptions.push_back(i);
+							}
+
+						}
+					}
+
 				}
-				*/
 			}
 			
 			int flag = 0;
@@ -1027,39 +1046,36 @@ void select(char choice, Dictionary mydict)
 		list <string> result;
 		list <string> combination;
 		for (int count = myword.length(); count > 0; count--) {
-			cout << endl << "new for loop ";
+			//cout << endl << "new for loop "<<endl;
 			result=mydict.startWordextra(clword.getRev().substr(0, count));
-			for (auto i : result) {
-					cout << i << endl;
-				}
 			if (result.size() > 0) {
-				cout << " =>остатък за търсене: " << clword.getRev().substr(count) << endl;
+				//cout << " =>остатък за търсене: " << clword.getRev().substr(count) << endl;
 				if (clword.getRev().substr(count).length() > 0) {
 					mydict.func2(0, clword.getRev().substr(count), helping, wordOptions);
 					if (!wordOptions.empty()) {
 						for (auto i : result) {
 							for (auto j : wordOptions) {
-								cout << i+" "+j << endl;
+								//cout << "combination " <<i+" "+j << endl;
 								combination.push_back(i + " " + j);
 							}
 						}
-						//wordOptions.clear();
+						wordOptions.clear();
 					}
 				}
-				/*else {
+				else {
 					for (auto i : result) {
-						cout  << i << endl;
+						//cout  <<"full comb " <<i << endl;
 						combination.push_back(i);
 					}
 					
-				}*/
+				}
 			}
 			
 		}
 		cout << endl << "Вариантите са:" << endl;
-		int c = 0;
+		int c = 1;
 		for (auto i : combination) {
-			cout << i << endl;
+			cout << c<<". "<< i << endl;
 			c++;
 		}
 		break;
@@ -1082,7 +1098,7 @@ int main() {
 	SetConsoleCP(1251);
 
 	try {
-		Dictionary two("d.txt");
+		Dictionary two("bgdict.txt");
 		/*
 		two << cout;
 		int all = 0;
