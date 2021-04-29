@@ -154,9 +154,10 @@ public:
 		return this->lmap[key];
 	}
 
-	int fin = 0;
 	vector<string> mypal;
-	int fin2 = 0;
+	int fin;
+	int fin2;
+	int countItr=0;
 
 	/*
 	void MMap() {
@@ -453,6 +454,7 @@ public:
 		int i = 1;
 		//position of char + number of chars should not be more than the length of the word +1
 		while (i + j <= word.length()) {
+			countItr++;
 			//check if the substr is not a word	
 			if (!legitWord(word.substr(j, i))) {
 				//if we get to the last character
@@ -476,9 +478,9 @@ public:
 						phr += word.substr(j, i) + "*";
 					}
 					//cout << "\t " << phr << "***. ";// << word.substr(j, i);// << " j=" << j; final
-					//fin will take the value of j
+					//*fin will take the value of j
 					fin = j;
-					//cout<< " fin=" << fin;
+					//cout<< " *fin=" << *fin;
 					if (canYouAdd(word.substr(j, i))) {
 						wordO->push_back(phr);
 					}
@@ -499,7 +501,7 @@ public:
 				}
 				//if it's a inbetween word put a tab and print it on a new line
 				else {
-					//cout << endl << fin << " " << j << " phr upto: " << phr;
+					//cout << endl << *fin << " " << j << " phr upto: " << phr;
 					//if the previous final phrase required a bigger than the current recursion, delete last word of the string
 					if (fin > j) {
 						const auto pos = phr.find_last_of(" \t\n");
@@ -521,13 +523,13 @@ public:
 				if (i + j != word.length()) {}//cout << " So far: " << phr << " j=" << j; }
 				else {
 					wordO->push_back(phr);
-					//cout << " \t Fin: " << phr << ".";// << " j=" << j;
+					//cout << " \t *fin: " << phr << ".";// << " j=" << j;
 					if (canYouAddVariant(word.substr(j, i))) {
 						phr +='*';
 						wordO->push_back(phr);
 					}
 					fin = j;
-					//cout << " fin: " << fin;
+					//cout << " *fin: " << *fin;
 				}
 				//check the substr starting with the char after the previous substr
 				func2(j + i, word, phr, wordO);
@@ -538,12 +540,13 @@ public:
 	}
 
 
-	string minusfunc2(int j, string word, string phr, list <string> *wordO) {
+	string minusfunc2(int j,  string word, string phr, list <string> *wordO) {
 		//i is number of chars that need to be substr
 		//cout << endl<<"j= "<< j ;
 		int i = 1;
 		//position of char should not be less than 0
 		while (j >= 0) {
+			countItr++;
 			//cout << endl << " fin2 =" << fin2 << " j =" << j << " i =" << i;
 			//check if the substr is not a word	
 			if (!legitWord(word.substr(j, i))) {
@@ -629,8 +632,10 @@ public:
 		SingleWord clword(myword);
 		string helping = "";
 		list <string> wordO;
+		int fin = 0;
 		if (mypal.size() == 1) { //check if that's the first word of the palindromic phrase
 			for (int count = 0; count < myword.length(); count++) {//checks if input word ends with palindrome of any length
+				countItr++;
 				SingleWord lastpart(clword.getWord().substr(count));
 				if (lastpart.isPal()) {
 					SingleWord clword2(clword.getWord().substr(0, count));
@@ -640,6 +645,7 @@ public:
 			//txt functions to add
 			
 			for (int count = myword.length(); count > 0; count--) {
+				countItr++;
 				string remainder = clword.getRev().substr(count);
 				list <string> result=startWordextra(clword.getRev().substr(0, count));
 				for (auto itr : result) {
@@ -674,10 +680,11 @@ public:
 			advance(it, option - 1);
 			// Now iterator it points to nth element
 			mypal.push_back(*it);
-			cout << endl << "Палиндромът дотук е: " << endl;
+			cout << endl << "Бяха извършени " << countItr << " итерации." << endl;
 			for (auto j : mypal) {
 				cout << j << " ";
 			}
+			cout << endl << "Палиндромът дотук е: " << endl;
 			//clear the options
 			wordO.clear();
 			//check if last char of last elem is a *
@@ -746,6 +753,7 @@ public:
 		string helping = "";
 		list <string> Wordo;
 		int flag = 0;
+		int fin2 = 0;
 		int start = myword.length() - 1;
 		minusfunc2(start, clword.getRev(), helping, &Wordo);
 
@@ -1027,6 +1035,7 @@ void select(char choice, Dictionary mydict)
 		SingleWord clword(myword);
 		string options;
 		list <string> wordO;
+		int fin = 0;
 		for (int count = myword.length(); count > 0; count--) {
 			cout << endl << "new for loop";
 			mydict.startWordextra(clword.getRev().substr(0, count));
