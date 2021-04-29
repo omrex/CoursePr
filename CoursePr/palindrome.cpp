@@ -358,7 +358,8 @@ public:
 		else cout << endl << "Няма думи завършващи с: " << first;
 	}
 
-	void startWordextra(string begword) {
+	list <string> startWordextra(string begword) {
+		list <string> result;
 		SingleWord beg(begword);
 		begword = beg.getRev();
 		char first = begword.at(0);
@@ -370,19 +371,20 @@ public:
 				[&](SingleWord v) { return v.getWord().substr(0, L) == begword; });
 			if (it != this->revmap[first].end()) {
 				// It does not point to end, it means at least one element exists in the list
-				cout << endl << "Има думи завършващи с: " << beg.getWord() << " чието начало е палиндром";
+				//cout << endl << "Има думи завършващи с: " << beg.getWord() << " чието начало е палиндром";
 				for (it; it != itr; it++) {
 					SingleWord word = *it;
 					SingleWord partOfWord(word.getWord().substr(L)); //get the rest of the word (word minus the input)
 					if (partOfWord.getWord().size() > 0 && partOfWord.isPal()) {
-						cout << endl << word.getRev();
-						//return word.getRev();
+						//cout << endl << word.getRev();
+						result.push_back (word.getRev());
 					}
 				}
 			}
-			else cout << endl << "Няма думи завършващи с: " << beg.getWord() << " чието начало е палиндром";
+			//else cout << endl << "Няма думи завършващи с: " << beg.getWord() << " чието начало е палиндром";
 		}
-		else cout << endl << "Няма думи завършващи с: " << first << " чието начало е палиндром";
+		//else cout << endl << "Няма думи завършващи с: " << first << " чието начало е палиндром";
+		return result;
 	}
 
 	bool canYouAdd(string begword) {
@@ -399,6 +401,24 @@ public:
 			else return false;
 		}
 		else return false;
+	}
+
+	bool canYouAddVariant(string begword) {
+		for (char i = 'а'; i <= 'я'; i++) {
+			if (canYouAdd(begword+i)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool canYouFinishVariant(string begword) {
+		for (char i = 'а'; i <= 'я'; i++) {
+			if (canYouFinish(i+begword)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	bool canYouFinish(string begword) {
@@ -502,6 +522,10 @@ public:
 				else {
 					wordO->push_back(phr);
 					//cout << " \t Fin: " << phr << ".";// << " j=" << j;
+					if (canYouAddVariant(word.substr(j, i))) {
+						phr +='*';
+						wordO->push_back(phr);
+					}
 					fin = j;
 					//cout << " fin: " << fin;
 				}
@@ -576,7 +600,10 @@ public:
 					fin2 = 1;
 					//cout << "\t\t\t:" << phr  ;// ". край";
 					wordO->push_back(phr);
-
+					if (canYouFinishVariant(word.substr(j, i))) {
+						phr = '*'+phr;
+						wordO->push_back(phr);
+					}
 				}
 				else {
 					phr.insert(0, " " + word.substr(j, i));
@@ -611,13 +638,20 @@ public:
 				}
 			}
 			//txt functions to add
-			/*
+			
 			for (int count = myword.length(); count > 0; count--) {
-				cout << endl << "new for loop";
-				startWordextra(clword.getRev().substr(0, count));
-				cout << " =>left: "<< clword.getRev().substr(count) <<endl;
+				string remainder = clword.getRev().substr(count);
+				list <string> result=startWordextra(clword.getRev().substr(0, count));
+				for (auto itr : result) {
+					if (canYouAddVariant(remainder)) {
+						wordO.push_back(itr + " " + remainder);
+					}
+				}
+				
 			}
-			*/
+			
+
+			
 		}
 
 		int flag = 0;
@@ -1031,7 +1065,7 @@ int main() {
 	SetConsoleCP(1251);
 
 	try {
-		Dictionary two("d.txt");
+		Dictionary two("bgdict.txt");
 
 		menu();
 		// Enter the choice 
