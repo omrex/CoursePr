@@ -94,6 +94,7 @@ private:
 
 	map <char, list <SingleWord>> lmap;
 	map <char, list <SingleWord>> revmap;
+
 	string art =
 		"@@@@@@@   @@@@    @@@@@ @@   @@ @@   @@      @@ @@@@@@   @@@@@  @@   @@ @@   @@\n"
 		"@@   @@     @@   @@  @@ @@  @@@ @@   @@   @@@@@ @@   @@ @@   @@ @@@ @@@ @@  @@@\n"
@@ -154,7 +155,6 @@ public:
 	}
 
 	int fin = 0;
-	list <string> wordOptions;
 	vector<string> mypal;
 	int fin2 = 0;
 
@@ -350,7 +350,7 @@ public:
 
 				for (it; it != itr; it++) {
 					SingleWord word = *it;
-					cout<<word.getRev() << endl;
+					cout << word.getRev() << endl;
 				}
 			}
 			else cout << endl << "Няма думи завършващи с: " << beg.getWord();
@@ -380,7 +380,7 @@ public:
 					}
 				}
 			}
-			else cout << endl << "Няма думи завършващи с: " << beg.getWord() <<" чието начало е палиндром";
+			else cout << endl << "Няма думи завършващи с: " << beg.getWord() << " чието начало е палиндром";
 		}
 		else cout << endl << "Няма думи завършващи с: " << first << " чието начало е палиндром";
 	}
@@ -409,7 +409,7 @@ public:
 		if (revmap.count(first) != 0) {
 			list <SingleWord>::iterator it = find_if(begin(this->revmap[first]), end(this->revmap[first]),
 				[&](SingleWord v) { return v.getWord().substr(0, L) == begword; });
-			if (it != this->revmap[first].end()) 
+			if (it != this->revmap[first].end())
 			{
 				// It does not point to end, it means at least one element exists in the list
 				return true;
@@ -418,25 +418,7 @@ public:
 		}
 		else return false;
 	}
-	/*
-	//vector of all 2-word palindromes
-	vector <pair<SingleWord, SingleWord>> getTwoWord() {
-		vector <pair<SingleWord, SingleWord>> Mirrors;
-		list <SingleWord>::iterator it = this->allwords.begin();
-		for (it; it != this->allwords.end(); it++) {
-			SingleWord oneword = *it;
-			int N = oneword.getWord().length();
-			list <SingleWord>::iterator itr = find_if(begin(this->allwords), end(this->allwords),
-				[&]( SingleWord v) { return v.getWord()[0]==oneword.getWord()[N-1]; });
 
-			for (itr; itr != this->allwords.end(); itr++) {
-				SingleWord secondword = *itr;
-				if (oneword.isMirror(secondword)) Mirrors.push_back({oneword,secondword});
-			}
-		}
-		return Mirrors;
-	}
-	*/
 	string space(int s) {
 		string a = "";
 		while (s > 0) {
@@ -446,7 +428,7 @@ public:
 		return a;
 	}
 
-	string func2(int j, string word, string phr) {
+	string func2(int j, string word, string phr, list <string> *wordO) {
 		//i is number of chars that need to be substr
 		int i = 1;
 		//position of char + number of chars should not be more than the length of the word +1
@@ -478,7 +460,7 @@ public:
 					fin = j;
 					//cout<< " fin=" << fin;
 					if (canYouAdd(word.substr(j, i))) {
-						wordOptions.push_back(phr);
+						wordO->push_back(phr);
 					}
 					//else cout << "\tНяма дума започваща така => невъзможна опция" << endl;
 					i++;
@@ -518,13 +500,13 @@ public:
 				//cout << word.substr(j, i);
 				if (i + j != word.length()) {}//cout << " So far: " << phr << " j=" << j; }
 				else {
-					wordOptions.push_back(phr);
+					wordO->push_back(phr);
 					//cout << " \t Fin: " << phr << ".";// << " j=" << j;
 					fin = j;
 					//cout << " fin: " << fin;
 				}
 				//check the substr starting with the char after the previous substr
-				func2(j + i, word, phr);
+				func2(j + i, word, phr, wordO);
 				i++;
 			}
 		}
@@ -532,35 +514,35 @@ public:
 	}
 
 
-	string minusfunc2(int j, string word, string phr) {
+	string minusfunc2(int j, string word, string phr, list <string> *wordO) {
 		//i is number of chars that need to be substr
 		//cout << endl<<"j= "<< j ;
 		int i = 1;
 		//position of char should not be less than 0
-		while (j>=0) {
+		while (j >= 0) {
 			//cout << endl << " fin2 =" << fin2 << " j =" << j << " i =" << i;
 			//check if the substr is not a word	
 			if (!legitWord(word.substr(j, i))) {
 				//if we get to the first character of the string – the end of the iter
-				if (j == 0) { 
+				if (j == 0) {
 					//indicate it's the beginning of the word (the end of iter) and decrease the position j so it can exit the while cycle		
 					//cout << endl;
 					if (fin2 > 0) {//== j + i
 						regex e("^(\\s*\\S+){1}");   // matches words beginning by " x"
-						phr=regex_replace(phr, e, "");
+						phr = regex_replace(phr, e, "");
 						//cout << endl << "phr af d:" << phr << ".";
 						fin2 = 0;
 					}
 					//cout <<endl << space(j+4)<< "**" << word.substr(j, i);
 					//if (i == word.length()) { phr = "*" + word.substr(j, i); }
 					//else {
-						phr.insert(0, "*" + word.substr(j, i));
+					phr.insert(0, "*" + word.substr(j, i));
 					//}
 						//cout << "\t\t\t:" << phr;// << "." << " Край" << " fin2 = " << fin2 << " j = " << j << " i = " << i;
-						if (canYouFinish(word.substr(j, i))) {
-							wordOptions.push_back(phr);
-						}
-						//else cout << "\tНяма дума започваща така => невъзможна опция" << endl;
+					if (canYouFinish(word.substr(j, i))) {
+						wordO->push_back(phr);
+					}
+					//else cout << "\tНяма дума започваща така => невъзможна опция" << endl;
 					fin2 = 1;
 					j--;
 				}
@@ -576,15 +558,15 @@ public:
 				//if it starts with the last letter of the word, start on a new line 
 				//cout << endl << fin2 << " " << j << " phr upto:" << phr<<".";
 					//if the previous final phrase required a bigger than the current recursion, delete last word of the string
-					
-				
-					if (fin2>0){//== j + i
-						regex e("^(\\s*\\S+){1}");   // matches words beginning by "sub"
-						phr=regex_replace(phr, e, "");
-						//cout << endl << "phr af d:" << phr<<".";
-						fin2 = 0;
-					}
-				
+
+
+				if (fin2 > 0) {//== j + i
+					regex e("^(\\s*\\S+){1}");   // matches words beginning by "sub"
+					phr = regex_replace(phr, e, "");
+					//cout << endl << "phr af d:" << phr<<".";
+					fin2 = 0;
+				}
+
 
 				//print the substr
 				//cout << endl << space(j + 8) << word.substr(j, i);// << " е дума fin2=" << fin2 << " j=" << j << " i=" << i;
@@ -593,19 +575,19 @@ public:
 					phr.insert(0, word.substr(j, i));
 					fin2 = 1;
 					//cout << "\t\t\t:" << phr  ;// ". край";
-					wordOptions.push_back(phr);
-					
+					wordO->push_back(phr);
+
 				}
 				else {
-					phr.insert(0," "+word.substr(j, i));
+					phr.insert(0, " " + word.substr(j, i));
 				}
-				
-				
-				
+
+
+
 				//fin2 = i + j;
 				//fin2 = j;
 				//check the substr starting with the char before the previous substr
-				minusfunc2(j - 1, word, phr);	
+				minusfunc2(j - 1, word, phr, wordO);
 				j--;
 				i++;
 
@@ -617,142 +599,137 @@ public:
 
 
 	bool createpal(string myword) {
-			SingleWord clword(myword);
-			string helping = "";			
-			if (mypal.size()==1) { //check if that's the first word of the palindromic phrase
-				for (int count = 0; count < myword.length(); count++) {//checks if input word ends with palindrome of any length
-					SingleWord lastpart(clword.getWord().substr(count));
-					if (lastpart.isPal()) {
-						SingleWord clword2 (clword.getWord().substr(0,count));
-						func2(0, clword2.getRev(), helping);
-					}				
+		SingleWord clword(myword);
+		string helping = "";
+		list <string> wordO;
+		if (mypal.size() == 1) { //check if that's the first word of the palindromic phrase
+			for (int count = 0; count < myword.length(); count++) {//checks if input word ends with palindrome of any length
+				SingleWord lastpart(clword.getWord().substr(count));
+				if (lastpart.isPal()) {
+					SingleWord clword2(clword.getWord().substr(0, count));
+					func2(0, clword2.getRev(), helping, &wordO);
 				}
-				//txt functions to add
-				/*
-				for (int count = myword.length(); count > 0; count--) {
-					cout << endl << "new for loop";
-					startWordextra(clword.getRev().substr(0, count));	
-					cout << " =>left: "<< clword.getRev().substr(count) <<endl;
-				}
-				*/
 			}
-			
-			int flag = 0;
-			func2(0, clword.getRev(), helping);
-			
-			if (!wordOptions.empty()) {
-				cout << endl << "Вариантите са:" << endl;
-				int count = 0;
-				for (auto i : wordOptions) {
-					cout << count + 1 << ". " << i << endl;
-					count++;
-				}
-				int option;
-				do {
-					cout << endl << "Кой вариант предпочитате?: ";
-					cin >> option;
-				} while (option > count);
-				list<string>::iterator it = wordOptions.begin();
-				// Advance the iterator by n positions,
-				advance(it, option - 1);
-				// Now iterator it points to nth element
-				mypal.push_back(*it);
-				cout << endl << "Палиндромът дотук е: " << endl;
-				for (auto j : mypal) {
-					cout << j << " ";
-				}
-				//clear the options
-				wordOptions.clear();
-				//check if last char of last elem is a *
-				if (mypal.back().at(mypal.back().length() - 1) == '*') {
-					const auto pos = mypal.back().find_last_of(" \t\n");
-					string unfinished = mypal.back().substr(pos + 1, mypal.back().length() - mypal.back().substr(0, pos + 1).length() - 1);
-					cout << endl << endl << "Как ще допишете " << unfinished <<"*?" << endl;
-					cout << "Натиснете 1 за да разгледате думи започващи с "<< unfinished <<endl;
-					cout << "Натиснете 2 за да допишете думата" << endl;
-					cout << "Натиснете 0 за да се върнете към предното меню" << endl;
-					char cha;
-					do {
-						cout << endl << "Въведи своя избор за дописване: ";
-						cin >> cha;
-						switch (cha) {
-						case '1': {
-							string mychars;
-							if (unfinished.length() < 3) {
-								do {
-									cout << "Добави " << 3 - unfinished.length() << " или повече букви: "<< unfinished;
-									cin >> mychars;
-								} while (unfinished.length()+mychars.length() < 3);
-							}
-							mychars=unfinished+mychars;
-							finishWord(mychars);
-							break;
-						}
-						case '2': {
-							string myword;
-							cout << "Въведи дума: " << unfinished;
-							cin >> myword;
-							//vector<string>::iterator itr = mypal.begin(); --old not sure what I needed it for
-							//mypal.insert(itr, myword);
-							if (!legitWord(unfinished+myword)) cout << endl << "Въведената дума е невалидна!" << endl;
-							else {
-								// maybe a solution for adding the end part to the word
-								mypal.back() = mypal.back().substr(0, pos+1)+unfinished+myword;
-								rightwordcreatepal(myword);
-								cha = '0';//to exit the do while cycle
-							}						
-							break;
-						}
-						case '0': {
-							break;
-						}
-						default:
-							cout << "Невалиден избор" << endl;
+			//txt functions to add
+			/*
+			for (int count = myword.length(); count > 0; count--) {
+				cout << endl << "new for loop";
+				startWordextra(clword.getRev().substr(0, count));
+				cout << " =>left: "<< clword.getRev().substr(count) <<endl;
+			}
+			*/
+		}
 
+		int flag = 0;
+		func2(0, clword.getRev(), helping, &wordO);
+
+		if (!wordO.empty()) {
+			cout << endl << "Вариантите са:" << endl;
+			int count = 0;
+			for (auto i : wordO) {
+				cout << count + 1 << ". " << i << endl;
+				count++;
+			}
+			int option;
+			do {
+				cout << endl << "Кой вариант предпочитате?: ";
+				cin >> option;
+			} while (option > count);
+			list<string>::iterator it = wordO.begin();
+			// Advance the iterator by n positions,
+			advance(it, option - 1);
+			// Now iterator it points to nth element
+			mypal.push_back(*it);
+			cout << endl << "Палиндромът дотук е: " << endl;
+			for (auto j : mypal) {
+				cout << j << " ";
+			}
+			//clear the options
+			wordO.clear();
+			//check if last char of last elem is a *
+			if (mypal.back().at(mypal.back().length() - 1) == '*') {
+				const auto pos = mypal.back().find_last_of(" \t\n");
+				string unfinished = mypal.back().substr(pos + 1, mypal.back().length() - mypal.back().substr(0, pos + 1).length() - 1);
+				cout << endl << endl << "Как ще допишете " << unfinished << "*?" << endl;
+				cout << "Натиснете 1 за да разгледате думи започващи с " << unfinished << endl;
+				cout << "Натиснете 2 за да допишете думата" << endl;
+				cout << "Натиснете 0 за да се върнете към предното меню" << endl;
+				char cha;
+				do {
+					cout << endl << "Въведи своя избор за дописване: ";
+					cin >> cha;
+					switch (cha) {
+					case '1': {
+						string mychars;
+						if (unfinished.length() < 3) {
+							do {
+								cout << "Добави " << 3 - unfinished.length() << " или повече букви: " << unfinished;
+								cin >> mychars;
+							} while (unfinished.length() + mychars.length() < 3);
 						}
-					} while (cha != '0');
-				}
-				cout << endl;
-				return true;
+						mychars = unfinished + mychars;
+						finishWord(mychars);
+						break;
+					}
+					case '2': {
+						string myword;
+						cout << "Въведи дума: " << unfinished;
+						cin >> myword;
+						//vector<string>::iterator itr = mypal.begin(); --old not sure what I needed it for
+						//mypal.insert(itr, myword);
+						if (!legitWord(unfinished + myword)) cout << endl << "Въведената дума е невалидна!" << endl;
+						else {
+							// maybe a solution for adding the end part to the word
+							mypal.back() = mypal.back().substr(0, pos + 1) + unfinished + myword;
+							rightwordcreatepal(myword);
+							cha = '0';//to exit the do while cycle
+						}
+						break;
+					}
+					case '0': {
+						break;
+					}
+					default:
+						cout << "Невалиден избор" << endl;
+
+					}
+				} while (cha != '0');
 			}
-			else {
-				cout << endl << "Не може да се създаде палиндром с тази дума ляво";
-				mypal.erase(mypal.begin(), mypal.begin()+1);
-			}
+			cout << endl;
+			return true;
+		}
+		else {
+			cout << endl << "Не може да се създаде палиндром с тази дума ляво";
+			mypal.erase(mypal.begin(), mypal.begin() + 1);
+		}
 		return false;
 	}
 
 
 
 	bool rightwordcreatepal(string myword) {
-		//string myword;
-		//cout << "Въведи дума: ";
-		//cin >> myword;
-		////vector<string>::iterator itr = mypal.begin();
-		////mypal.insert(itr, myword);
-		//if (!legitWord(myword)) cout << endl << "Въведената дума е невалидна!" << endl;
-		//else {
-		//mypal.push_back(myword);
 		SingleWord clword(myword);
 		string helping = "";
+		list <string> Wordo;
 		int flag = 0;
 		int start = myword.length() - 1;
-		minusfunc2(start, clword.getRev(), helping);
-		
-		if (!wordOptions.empty()) {
+		minusfunc2(start, clword.getRev(), helping, &Wordo);
+
+		if (!Wordo.empty()) {
 			cout << endl << "Вариантите са:" << endl;
 			int count = 0;
-			for (auto i : wordOptions) {
+			for (auto i : Wordo) {
 				cout << count + 1 << ". " << i << endl;
 				count++;
 			}
 			cout << endl;
+			
 			int option;
 			do {
 				cout << endl << "Кой вариант предпочитате?: ";
 				cin >> option;
 			} while (option > count);
-			list<string>::iterator it = wordOptions.begin();
+			list<string>::iterator it = Wordo.begin();
 			// Advance the iterator by n positions,
 			advance(it, option - 1);
 			// Now iterator it points to nth element
@@ -764,10 +741,11 @@ public:
 				cout << j << " ";
 			}
 			cout << endl;
-			wordOptions.clear();
+
+			Wordo.clear();
 			if (mypal.front().at(0) == '*') {
 				const auto pos = mypal.front().find(" \t\n");
-				string unfinished = mypal.front().substr(1,pos);
+				string unfinished = mypal.front().substr(1, pos);
 				cout << endl << endl << "Как ще допишете *" << unfinished << "?" << endl;
 				cout << "Натиснете 1 за да разгледате думи завършващи на " << unfinished << endl;
 				cout << "Натиснете 2 за да допишете думата" << endl;
@@ -781,7 +759,7 @@ public:
 						string mychars;
 						if (unfinished.length() < 3) {
 							do {
-								cout << "Добави "<< 3-unfinished.length() <<" или повече букви преди " <<unfinished<<":"<<endl;
+								cout << "Добави " << 3 - unfinished.length() << " или повече букви преди " << unfinished << ":" << endl;
 								cin >> mychars;
 								if (!mychars.ends_with(unfinished)) cout << "Въведените букви не завършват с " << unfinished << "!";
 								else {
@@ -790,12 +768,12 @@ public:
 								}
 							} while (unfinished.length() + mychars.length() < 3);
 						}
-						
+
 						break;
 					}
 					case '2': {
 						string myword;
-						cout << "Въведи дума, завършваща на " << unfinished<<": ";
+						cout << "Въведи дума, завършваща на " << unfinished << ": ";
 						cin >> myword;
 						//vector<string>::iterator itr = mypal.begin(); --old not sure what I needed it for
 						//mypal.insert(itr, myword);
@@ -803,11 +781,11 @@ public:
 						else {
 							if (!legitWord(myword)) cout << endl << "Въведената дума е невалидна!" << endl;
 							else {
-								auto end = myword.find(unfinished);					
-								myword=myword.substr(0, end);
+								auto end = myword.find(unfinished);
+								myword = myword.substr(0, end);
 								// maybe a solution for adding the first part to the word
 								mypal.front().erase(0, 1);
-								mypal.front()= mypal.front().insert(0, myword);
+								mypal.front() = mypal.front().insert(0, myword);
 								createpal(myword);
 								cha = '0';//to exit the do while cycle
 							}
@@ -823,14 +801,15 @@ public:
 					}
 				} while (cha != '0');
 			}
+			
 			return true;
 		}
 		else {
 			cout << endl << "Не може да се създаде палиндром с тази дума дясно";
 			mypal.pop_back(); //delete the word from the user
 		}
-	//}
-	return false;
+		//}
+		return false;
 	}
 
 
@@ -842,9 +821,6 @@ void submenu4()
 	cout << endl;
 	cout << "Натиснете 1 за да напишете дума отляво" << endl;
 	cout << "Натиснете 2 за да напишете дума отдясно" << endl;
-	cout << "Натиснете 3 за да " << endl;
-	cout << "Натиснете 4 за да " << endl;
-	cout << "Натиснете 5 за да " << endl;
 	cout << "Натиснете 0 за да се върнете към предното меню" << endl;
 }
 
@@ -961,7 +937,7 @@ void select(char choice, Dictionary mydict)
 				} while (cha != '0');
 			}
 		}
-		mydict.wordOptions.clear();
+		//wordO.clear();
 		break;
 	}
 	case '5': {
@@ -978,8 +954,6 @@ void select(char choice, Dictionary mydict)
 		string myword;
 		cout << "Въведи дума: ";
 		cin >> myword;
-		//vector<string>::iterator itr = mypal.begin();
-		//mypal.insert(itr, myword);
 		if (!mydict.legitWord(myword)) cout << endl << "Въведената дума е невалидна!" << endl;
 		else {
 			mydict.mypal.push_back(myword);
@@ -1011,34 +985,35 @@ void select(char choice, Dictionary mydict)
 
 		break;
 	}
-			
+
 	case '9': {
 		string myword;
 		cout << "Въведи думата: ";
 		cin >> myword;
 		SingleWord clword(myword);
 		string options;
+		list <string> wordO;
 		for (int count = myword.length(); count > 0; count--) {
 			cout << endl << "new for loop";
 			mydict.startWordextra(clword.getRev().substr(0, count));
 			cout << " =>остатък за търсене: " << clword.getRev().substr(count) << endl;
 			if (clword.getRev().substr(count).length() > 0) {
-				mydict.func2(0,clword.getRev().substr(count), options);
-				if (!mydict.wordOptions.empty()) {
+				mydict.func2(0, clword.getRev().substr(count), options, &wordO);
+				if (!wordO.empty()) {
 					cout << endl << "Вариантите са:" << endl;
 					int count = 0;
-					for (auto i : mydict.wordOptions) {
+					for (auto i : wordO) {
 						cout << count + 1 << ". " << i << endl;
 						count++;
 					}
-					mydict.wordOptions.clear();
+					wordO.clear();
 				}
 			}
 		}
 
 		break;
 	}
-	
+
 	case '0': {
 		cout << "До нови срещи!" << endl;
 		break;
@@ -1057,28 +1032,6 @@ int main() {
 
 	try {
 		Dictionary two("d.txt");
-		/*
-		two << cout;
-		int all = 0;
-		for (auto i : two.getOneWord()) {
-			i <<  cout;
-			cout << endl;
-			all++;
-		}
-		cout << endl << "All words are: " << all << endl;
-
-		for (auto i : two.getTwoWord()) {
-			i.first << cout <<" ";
-			i.second << cout;
-			cout << endl;
-		}
-		*/
-
-
-		//two.MMap();
-		//two.LMap();
-		//cout << endl;
-		//two.RevMap();
 
 		menu();
 		// Enter the choice 
@@ -1088,16 +1041,6 @@ int main() {
 			cin >> ch;
 			select(ch, two);
 		} while (ch != '0');
-
-	
-		/*
-		cout << endl << "проверка за всичко" << endl;
-		for (auto i : two.getTwoPal()) {
-			i.first << cout << " ";
-			i.second << cout;
-			cout << endl;
-		}
-		*/
 
 	}
 	catch (runtime_error e) {
