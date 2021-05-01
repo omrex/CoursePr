@@ -388,6 +388,7 @@ public:
 		return result;
 	}
 
+	//is there a word that starts with the funct argument
 	bool canYouAdd(string begword) {
 		char first = begword.at(0);
 		int L = begword.length();
@@ -422,6 +423,7 @@ public:
 		return false;
 	}
 
+	//is there a word that ends with the func parameter
 	bool canYouFinish(string begword) {
 		SingleWord beg(begword);
 		begword = beg.getRev();
@@ -449,7 +451,7 @@ public:
 		return a;
 	}
 
-	string func2(int j, string word, string phr, list <string> *wordO) {
+	string divideLeftRight(int j, string word, string phr, list <string> *wordO) {
 		//i is number of chars that need to be substr
 		int i = 1;
 		//position of char + number of chars should not be more than the length of the word +1
@@ -532,7 +534,7 @@ public:
 					//cout << " *fin: " << *fin;
 				}
 				//check the substr starting with the char after the previous substr
-				func2(j + i, word, phr, wordO);
+				divideLeftRight(j + i, word, phr, wordO);
 				i++;
 			}
 		}
@@ -540,7 +542,7 @@ public:
 	}
 
 
-	string minusfunc2(int j,  string word, string phr, list <string> *wordO) {
+	string divideRightLeft(int j,  string word, string phr, list <string> *wordO) {
 		//i is number of chars that need to be substr
 		//cout << endl<<"j= "<< j ;
 		int i = 1;
@@ -617,7 +619,7 @@ public:
 				//fin2 = i + j;
 				//fin2 = j;
 				//check the substr starting with the char before the previous substr
-				minusfunc2(j - 1, word, phr, wordO);
+				divideRightLeft(j - 1, word, phr, wordO);
 				j--;
 				i++;
 
@@ -639,7 +641,7 @@ public:
 				SingleWord lastpart(clword.getWord().substr(count));
 				if (lastpart.isPal()) {
 					SingleWord clword2(clword.getWord().substr(0, count));
-					func2(0, clword2.getRev(), helping, &wordO);
+					divideLeftRight(0, clword2.getRev(), helping, &wordO);
 				}
 			}
 			//txt functions to add
@@ -661,9 +663,11 @@ public:
 		}
 
 		int flag = 0;
-		func2(0, clword.getRev(), helping, &wordO);
+		divideLeftRight(0, clword.getRev(), helping, &wordO);
 
 		if (!wordO.empty()) {
+			cout << endl << "Бяха извършени " << countItr << " итерации." << endl;
+			countItr = 0;
 			cout << endl << "Вариантите са:" << endl;
 			int count = 0;
 			for (auto i : wordO) {
@@ -680,11 +684,10 @@ public:
 			advance(it, option - 1);
 			// Now iterator it points to nth element
 			mypal.push_back(*it);
-			cout << endl << "Бяха извършени " << countItr << " итерации." << endl;
+			cout << endl << "Палиндромът дотук е: " << endl;
 			for (auto j : mypal) {
 				cout << j << " ";
 			}
-			cout << endl << "Палиндромът дотук е: " << endl;
 			//clear the options
 			wordO.clear();
 			//check if last char of last elem is a *
@@ -722,7 +725,7 @@ public:
 						else {
 							// maybe a solution for adding the end part to the word
 							mypal.back() = mypal.back().substr(0, pos + 1) + unfinished + myword;
-							rightwordcreatepal(myword);
+							createPalToTheLeft(myword);
 							cha = '0';//to exit the do while cycle
 						}
 						break;
@@ -748,16 +751,18 @@ public:
 
 
 
-	bool rightwordcreatepal(string myword) {
+	bool createPalToTheLeft(string myword) {
 		SingleWord clword(myword);
 		string helping = "";
 		list <string> Wordo;
 		int flag = 0;
 		int fin2 = 0;
 		int start = myword.length() - 1;
-		minusfunc2(start, clword.getRev(), helping, &Wordo);
+		divideRightLeft(start, clword.getRev(), helping, &Wordo);
 
 		if (!Wordo.empty()) {
+			cout << endl << "Бяха извършени " << countItr << " итерации." << endl;
+			countItr = 0;
 			cout << endl << "Вариантите са:" << endl;
 			int count = 0;
 			for (auto i : Wordo) {
@@ -961,7 +966,7 @@ void select(char choice, Dictionary mydict)
 						if (!mydict.legitWord(myword)) cout << endl << "Въведената дума е невалидна!" << endl;
 						else {
 							mydict.mypal.push_back(myword);
-							mydict.rightwordcreatepal(myword);
+							mydict.createPalToTheLeft(myword);
 						}
 						break;
 					}
@@ -999,7 +1004,7 @@ void select(char choice, Dictionary mydict)
 		if (!mydict.legitWord(myword)) cout << endl << "Въведената дума е невалидна!" << endl;
 		else {
 			mydict.mypal.push_back(myword);
-			mydict.rightwordcreatepal(myword);
+			mydict.createPalToTheLeft(myword);
 		}
 		break;
 	}
@@ -1041,7 +1046,7 @@ void select(char choice, Dictionary mydict)
 			mydict.startWordextra(clword.getRev().substr(0, count));
 			cout << " =>остатък за търсене: " << clword.getRev().substr(count) << endl;
 			if (clword.getRev().substr(count).length() > 0) {
-				mydict.func2(0, clword.getRev().substr(count), options, &wordO);
+				mydict.divideLeftRight(0, clword.getRev().substr(count), options, &wordO);
 				if (!wordO.empty()) {
 					cout << endl << "Вариантите са:" << endl;
 					int count = 0;
