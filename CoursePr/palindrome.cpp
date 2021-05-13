@@ -29,6 +29,7 @@ public:
 	SingleWord(string word) {
 		this->m_word = word;
 	}
+	//changes first letter from capital to small
 	void toLower() {
 		if (this->m_word[0] >= 'А' && this->m_word[0] <= 'Я') {
 			this->m_word[0] = this->m_word[0] + 32;
@@ -37,6 +38,7 @@ public:
 	string getWord() {
 		return this->m_word;
 	}
+	//returns the reversed version of the word
 	string getRev() {
 		string back = this->m_word;
 		int len = back.length();
@@ -212,7 +214,7 @@ public:
 	*/
 	/*
 	//vector of all 1-word palindromes from list
-	vector <SingleWord> getOneWord() {
+	vector <SingleWord> getPal() {
 		vector <SingleWord> Palindromes;
 		list <SingleWord>::iterator it = this->allwords.begin();
 		for (it; it != this->allwords.end(); it++) {
@@ -556,7 +558,7 @@ public:
 				if (j == 0) {
 					//indicate it's the beginning of the word (the end of iter) and decrease the position j so it can exit the while cycle		
 					//cout << endl;
-					if (fin2 > 0) {//== j + i
+					if (fin2 > 0) {
 						regex e("^(\\s*\\S+){1}");   // matches words beginning by " x"
 						phr = regex_replace(phr, e, "");
 						//cout << endl << "phr af d:" << phr << ".";
@@ -645,20 +647,21 @@ public:
 				}
 			}
 			//txt functions to add
-			
+			//checks if it can add letters to the sec word that are palindromes of themselves
 			for (int count = myword.length(); count > 0; count--) {
 				countItr++;
 				string remainder = clword.getRev().substr(count);
 				list <string> result=startWordextra(clword.getRev().substr(0, count));
-				for (auto itr : result) {
-					if (canYouAddVariant(remainder)) {
-						wordO.push_back(itr + " " + remainder);
-					}
+				//cout << remainder << endl;
+						if (canYouAddVariant(remainder)) {
+							for (auto itr : result) {
+								//cout << itr << endl;
+								wordO.push_back(itr + " " + remainder);
+							}
+						}					
+					//cout << endl;
 				}
 				
-			}
-			
-
 			
 		}
 
@@ -705,11 +708,11 @@ public:
 					switch (cha) {
 					case '1': {
 						string mychars;
-						if (unfinished.length() < 3) {
+						if (unfinished.length() < 2) {
 							do {
-								cout << "Добави " << 3 - unfinished.length() << " или повече букви: " << unfinished;
+								cout << "Добави " << 2 - unfinished.length() << " или повече букви: " << unfinished;
 								cin >> mychars;
-							} while (unfinished.length() + mychars.length() < 3);
+							} while (unfinished.length() + mychars.length() < 2);
 						}
 						mychars = unfinished + mychars;
 						finishWord(mychars);
@@ -717,17 +720,21 @@ public:
 					}
 					case '2': {
 						string myword;
-						cout << "Въведи дума: " << unfinished;
-						cin >> myword;
+							cout << "Въведи дума: " << unfinished;
+							cin >> myword;
 						//vector<string>::iterator itr = mypal.begin(); --old not sure what I needed it for
 						//mypal.insert(itr, myword);
-						if (!legitWord(unfinished + myword)) cout << endl << "Въведената дума е невалидна!" << endl;
-						else {
+							while (!legitWord(unfinished + myword)) {
+								cout << endl << "Въведената дума е невалидна!" << endl;
+								cout << "Въведи дума: " << unfinished;
+								cin >> myword;
+							} 
+						//else {
 							// maybe a solution for adding the end part to the word
 							mypal.back() = mypal.back().substr(0, pos + 1) + unfinished + myword;
 							createPalToTheLeft(myword);
 							cha = '0';//to exit the do while cycle
-						}
+						//}
 						break;
 					}
 					case '0': {
@@ -743,7 +750,7 @@ public:
 			return true;
 		}
 		else {
-			cout << endl << "Не може да се създаде палиндром с тази дума ляво";
+			cout << endl << "Не може да се създаде палиндром с тази дума отляво";
 			mypal.erase(mypal.begin(), mypal.begin() + 1);
 		}
 		return false;
@@ -804,16 +811,16 @@ public:
 					switch (cha) {
 					case '1': {
 						string mychars;
-						if (unfinished.length() < 3) {
+						if (unfinished.length() < 2) {
 							do {
-								cout << "Добави " << 3 - unfinished.length() << " или повече букви преди " << unfinished << ":" << endl;
+								cout << "Добави " << 2 - unfinished.length() << " или повече букви преди " << unfinished << ":" << endl;
 								cin >> mychars;
 								if (!mychars.ends_with(unfinished)) cout << "Въведените букви не завършват с " << unfinished << "!";
 								else {
 									//mychars = mychars + unfinished;
 									startWord(mychars);
 								}
-							} while (unfinished.length() + mychars.length() < 3);
+							} while (unfinished.length() + mychars.length() < 2);
 						}
 
 						break;
@@ -826,8 +833,12 @@ public:
 						//mypal.insert(itr, myword);
 						if (!myword.ends_with(unfinished)) cout << "Въведената дума не завършва на " << unfinished << "!";
 						else {
-							if (!legitWord(myword)) cout << endl << "Въведената дума е невалидна!" << endl;
-							else {
+							while (!legitWord(myword)) {
+									cout << endl << "Въведената дума е невалидна!" << endl;
+									cout << "Въведи дума, завършваща на " << unfinished << ": ";
+									cin >> myword;
+							}
+							//else {
 								auto end = myword.find(unfinished);
 								myword = myword.substr(0, end);
 								// maybe a solution for adding the first part to the word
@@ -835,7 +846,7 @@ public:
 								mypal.front() = mypal.front().insert(0, myword);
 								createpal(myword);
 								cha = '0';//to exit the do while cycle
-							}
+							//}
 						}
 						break;
 					}
@@ -852,7 +863,7 @@ public:
 			return true;
 		}
 		else {
-			cout << endl << "Не може да се създаде палиндром с тази дума дясно";
+			cout << endl << "Не може да се създаде палиндром с тази дума отдясно";
 			mypal.pop_back(); //delete the word from the user
 		}
 		//}
@@ -876,12 +887,10 @@ void menu()
 	cout << "Натиснете 1 за да разгледате всички думи палиндроми" << endl;
 	cout << "Натиснете 2 за да проверите дали огледална дума съществува" << endl;
 	cout << "Натиснете 3 за да разгледате всички огледални думи, започващи с конкретна буква" << endl;
-	cout << "Натиснете 4 за да създадете палиндром надясно" << endl;
+	cout << "Натиснете 4 за да създадете палиндром" << endl;
 	cout << "Натиснете 5 за да намерите думи, започващи с конкретни букви" << endl;
-	cout << "Натиснете 6 за да създадете палиндром наляво" << endl;
-	cout << "Натиснете 7 за да намерите думи, завършващи с конкретни букви" << endl;
-	cout << "Натиснете 8 за да намерите думи, завършващи с конкретни букви, чието начало е палиндром" << endl;
-	cout << "Натиснете 9 за да да добавите дума, която завършва на въведената дума, но началото е палиндром" << endl;
+	cout << "Натиснете 6 за да намерите думи, завършващи с конкретни букви" << endl;
+	cout << "Натиснете 7 за да намерите думи, завършващи с конкретни букви, чието начало е палиндром" << endl;
 	cout << "Натиснете 0 за да затворите програмата" << endl;
 }
 
@@ -998,17 +1007,6 @@ void select(char choice, Dictionary mydict)
 		break;
 	}
 	case '6': {
-		string myword;
-		cout << "Въведи дума: ";
-		cin >> myword;
-		if (!mydict.legitWord(myword)) cout << endl << "Въведената дума е невалидна!" << endl;
-		else {
-			mydict.mypal.push_back(myword);
-			mydict.createPalToTheLeft(myword);
-		}
-		break;
-	}
-	case '7': {
 		string mychars;
 		cout << "Въведи две или повече крайни букви на думата: ";
 		cin >> mychars;
@@ -1020,7 +1018,7 @@ void select(char choice, Dictionary mydict)
 
 		break;
 	}
-	case '8': {
+	case '7': {
 		string mychars;
 		cout << "Въведи две или повече крайни букви на думата: ";
 		cin >> mychars;
@@ -1029,35 +1027,6 @@ void select(char choice, Dictionary mydict)
 			break;
 		}
 		mydict.startWordextra(mychars);
-
-		break;
-	}
-
-	case '9': {
-		string myword;
-		cout << "Въведи думата: ";
-		cin >> myword;
-		SingleWord clword(myword);
-		string options;
-		list <string> wordO;
-		int fin = 0;
-		for (int count = myword.length(); count > 0; count--) {
-			cout << endl << "new for loop";
-			mydict.startWordextra(clword.getRev().substr(0, count));
-			cout << " =>остатък за търсене: " << clword.getRev().substr(count) << endl;
-			if (clword.getRev().substr(count).length() > 0) {
-				mydict.divideLeftRight(0, clword.getRev().substr(count), options, &wordO);
-				if (!wordO.empty()) {
-					cout << endl << "Вариантите са:" << endl;
-					int count = 0;
-					for (auto i : wordO) {
-						cout << count + 1 << ". " << i << endl;
-						count++;
-					}
-					wordO.clear();
-				}
-			}
-		}
 
 		break;
 	}
